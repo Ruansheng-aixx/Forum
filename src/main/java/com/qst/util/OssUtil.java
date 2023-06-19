@@ -19,15 +19,15 @@ public class OssUtil {
 
     //==========================下面五项配置修改成自己的========================//
     //区域
-    private static String endpoint = "oss-cn-beijing.aliyuncs.com";
+    private static String endpoint = "11111111111111";
     //访问id
-    private static String accessKeyId = "LTAI5tRqKU5upLkMFT8wk2Ae";
+    private static String accessKeyId = "1111111111111";
     //访问秘钥
-    private static String accessKeySecret = "YD5DqQ6qF2vsZ49Ok5jd8jFa3Cplz2";
+    private static String accessKeySecret = "1111111111111";
     //桶名称
-    private static String bucketName = "forumuseravatar";
+    private static String bucketName = "11111111111";
     //访问URL
-    private static String url = "https://forumuseravatar.oss-cn-beijing.aliyuncs.com";
+    private static String url = "1111111111111111";
 
 
     //文件上传
