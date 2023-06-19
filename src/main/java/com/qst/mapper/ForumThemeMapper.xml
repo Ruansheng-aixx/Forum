@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- mybatis 框架头文件声明，类似spring环境，均需要加入头文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qst.mapper.ForumThemeMapper">
+    <select id="getForumThemeList" resultType="forumTheme">
+        select * from tb_forum_theme
+    </select>
+
+    <insert id="addForumTheme">
+        insert into tb_forum_theme (theme_name) values (#{themeName})
+    </insert>
+
+    <select id="getForumThemeById" resultType="forumTheme">
+        select * from tb_forum_theme where id=#{id}
+    </select>
+
+    <update id="editForumTheme">
+        update tb_forum_theme set theme_name=#{themeName} where id=#{id}
+    </update>
+
+    <delete id="deleteOneThemeById">
+        delete from tb_forum_theme where id=#{id}
+    </delete>
+
+    <delete id="deleteSelectedTheme">
+        delete from tb_forum_theme where id in
+        <foreach collection="array" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </delete>
+</mapper>

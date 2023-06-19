@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- mybatis 框架头文件声明，类似spring环境，均需要加入头文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qst.mapper.UserMapper">
+
+    <select id="login" resultType="user">
+        select id,user_name as userName,avatar,role_id as roleId from tb_user where user_name=#{userName} and user_pwd=#{userPwd}
+    </select>
+
+    <select id="getByUserName" resultType="user">
+        select id,user_name as userName,user_pwd as userPwd,gender as gender from tb_user where user_name=#{userName}
+    </select>
+
+    <insert id="register">
+        insert into tb_user (user_name,user_pwd,gender,role_id) values (#{userName},#{userPwd},#{gender},#{roleId})
+    </insert>
+
+    <select id="getById" resultType="user">
+        select * from tb_user where id = #{id}
+    </select>
+
+    <update id="update">
+        update tb_user set user_name=#{userName},user_pwd=#{userPwd},gender=#{gender},avatar=#{avatar},real_name=#{realName},telephone=#{telephone},mail=#{mail},address=#{address} where id=#{id}
+    </update>
+
+    <insert id="addUser">
+        insert into tb_user (user_name,user_pwd,gender,role_id,avatar,real_name,telephone,mail,address) values (#{userName},#{userPwd},#{gender},#{roleId},#{avatar},#{realName},#{telephone},#{mail},#{address})
+    </insert>
+
+    <select id="getUserList" resultType="user">
+        select * from tb_user
+        <where>
+            role_id=3
+            <if test="keyWord!=null and keyWord!=''">
+
+                and(
+                id like concat('%',#{keyWord},'%')
+                or user_name like concat('%',#{keyWord},'%')
+                or user_pwd like concat('%',#{keyWord},'%')
+                or real_name like concat('%',#{keyWord},'%')
+                or gender like concat('%',#{keyWord},'%')
+                or telephone like concat('%',#{keyWord},'%')
+                or mail like concat('%',#{keyWord},'%')
+                or address like concat('%',#{keyWord},'%')
+                )
+
+            </if>
+
+        </where>
+        <if test="sortField != null and sortField != ''">
+            ORDER BY #{sortField} #{sortOrder}
+        </if>
+    </select>
+
+    <select id="getCount" resultType="user">
+        select * from tb_user where role_id=3
+    </select>
+
+    <delete id="deleteOneUser">
+        delete from tb_user where id=#{id}
+    </delete>
+
+    <delete id="deleteSelectedUser">
+        delete from tb_user where id in
+        <foreach collection="array" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </delete>
+
+    <update id="addAdmin">
+        update tb_user set role_id=2 where id=#{id}
+    </update>
+
+    <select id="getAdminList" resultType="user">
+        select * from tb_user
+        <where>
+            role_id=2
+            <if test="keyWord!=null and keyWord!=''">
+
+                and(
+                id like concat('%',#{keyWord},'%')
+                or user_name like concat('%',#{keyWord},'%')
+                or user_pwd like concat('%',#{keyWord},'%')
+                or real_name like concat('%',#{keyWord},'%')
+                or gender like concat('%',#{keyWord},'%')
+                or telephone like concat('%',#{keyWord},'%')
+                or mail like concat('%',#{keyWord},'%')
+                or address like concat('%',#{keyWord},'%')
+                )
+
+            </if>
+
+        </where>
+        <if test="sortField != null and sortField != ''">
+            ORDER BY #{sortField} #{sortOrder}
+        </if>
+    </select>
+
+    <update id="deleteAdmin">
+        update tb_user set role_id=3 where id=#{id}
+    </update>
+</mapper>

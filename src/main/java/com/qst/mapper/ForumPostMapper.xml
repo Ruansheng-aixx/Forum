@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- mybatis 框架头文件声明，类似spring环境，均需要加入头文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qst.mapper.ForumPostMapper">
+    <insert id="addForumPost">
+        insert into tb_forum_post (theme_id,post_name,post_picture,post_context,release_time,post_views,publisher,target) values (#{themeId},#{postName},#{postPicture},#{postContext},#{releaseTime},#{postViews},#{publisher},#{target})
+    </insert>
+
+    <resultMap id="userForumPostVo" type="com.qst.vo.UserForumPostVo">
+        <id column="id" property="id"></id>
+        <result column="user_name" property="userName"></result>
+        <result column="theme_name" property="themeName"></result>
+        <result column="post_name" property="postName"></result>
+        <result column="post_picture" property="postPicture"></result>
+        <result column="release_time" property="releaseTime"></result>
+        <result column="post_views" property="postViews"></result>
+        <result column="post_context" property="postContext"></result>
+        <result column="theme_id" property="themeId"></result>
+        <result column="publisher" property="publisher"></result>
+    </resultMap>
+
+    <select id="getMyForumPostList" resultMap="userForumPostVo">
+        SELECT tb2.id as id,theme_name,post_name,post_picture,release_time,user_name,post_views
+        FROM
+        (SELECT t1.id as id,theme_id,post_name,post_picture,release_time,user_name,post_views
+        FROM tb_forum_post t1
+        INNER JOIN tb_user t2 ON t1.publisher=t2.id AND t1.target=1
+        WHERE t2.id=${id}
+        ) AS tb2
+        INNER JOIN tb_forum_theme tb1 ON tb1.id=tb2.theme_id
+        <where>
+            <if test="keyWord!=null and keyWord!=''">
+
+                tb2.id like concat('%',#{keyWord},'%')
+                or theme_name like concat('%',#{keyWord},'%')
+                or post_name like concat('%',#{keyWord},'%')
+                or release_time like concat('%',#{keyWord},'%')
+                or user_name like concat('%',#{keyWord},'%')
+
+            </if>
+
+        </where>
+        <if test="sortField != null and sortField != ''">
+            ORDER BY #{sortField} #{sortOrder}
+        </if>
+
+    </select>
+
+    <select id="getCount" resultType="forumPost">
+        select * from tb_forum_post where publisher=#{id} and target=1
+    </select>
+
+    <select id="getUserForumPostVoId" resultMap="userForumPostVo">
+        select tb1.id,theme_name,post_name,post_picture,post_context,release_time,post_views,user_name
+        from(select t1.id,theme_id,post_name,post_picture,post_context,release_time,post_views,user_name
+             from (select id,theme_id,post_name,post_picture,post_context,release_time,post_views,publisher
+                   from tb_forum_post where id=#{id} and target=1)t1
+                      INNER JOIN tb_user t2 on t1.publisher=t2.id)tb1
+                INNER JOIN tb_forum_theme tb2 on tb1.theme_id=tb2.id
+    </select>
+
+    <update id="deleteOneForumPost">
+        update tb_forum_post set target=0,delete_time=#{currentTime} where id=#{id}
+    </update>
+
+    <update id="deleteSelectedForumPosts">
+        UPDATE tb_forum_post
+        SET target=0,delete_time=#{currentTime}
+        WHERE id IN
+        <foreach collection="ids" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </update>
+
+    <select id="getForumPostById" resultMap="userForumPostVo">
+        select id,theme_id,post_name,post_picture,post_context,release_time,publisher
+        from tb_forum_post where id=#{id} and target=1
+    </select>
+
+    <update id="editForumPost">
+        UPDATE tb_forum_post
+        SET theme_id=#{themeId},post_name=#{postName},post_context=#{postContext},post_picture=#{postPicture}
+        WHERE id=#{id}
+    </update>
+
+    <select id="getPostPublisherById" resultType="Integer">
+        select publisher from tb_forum_post where id=#{id}
+    </select>
+
+    <update id="addPostViews">
+        update tb_forum_post set post_views = post_views+1 where id=#{forumId}
+    </update>
+
+    <update id="deleteForumPostByPublisher">
+        UPDATE tb_forum_post
+        SET target=0,delete_time=#{currentTime}
+        WHERE publisher=#{id}
+    </update>
+
+    <select id="getForumPostByPublisher" resultType="forumPost">
+        select *
+        from tb_forum_post where publisher=#{id}
+    </select>
+
+    <update id="deleteForumPostByPublisherList">
+        UPDATE tb_forum_post
+        SET target=0,delete_time=#{currentTime}
+        WHERE publisher IN
+        <foreach collection="ids" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </update>
+
+    <update id="deleteForumPostByThemeList">
+        UPDATE tb_forum_post
+        SET target=0,delete_time=#{currentTime}
+        WHERE theme_id IN
+        <foreach collection="ids" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </update>
+
+    <select id="getAllForumPostList" resultMap="userForumPostVo">
+        SELECT tb2.id as id,theme_name,post_name,post_picture,release_time,user_name,post_views
+        FROM
+        (SELECT t1.id as id,theme_id,post_name,post_picture,release_time,user_name,post_views
+        FROM tb_forum_post t1
+        INNER JOIN tb_user t2 ON t1.publisher=t2.id AND t1.target=1
+        ) AS tb2
+        INNER JOIN tb_forum_theme tb1 ON tb1.id=tb2.theme_id
+        <where>
+            <if test="keyWord!=null and keyWord!=''">
+
+                tb2.id like concat('%',#{keyWord},'%')
+                or theme_name like concat('%',#{keyWord},'%')
+                or post_name like concat('%',#{keyWord},'%')
+                or release_time like concat('%',#{keyWord},'%')
+                or user_name like concat('%',#{keyWord},'%')
+                or post_context like concat('%',#{keyWord},'%')
+
+            </if>
+
+        </where>
+        <if test="sortField != null and sortField != ''">
+            ORDER BY #{sortField} #{sortOrder}
+        </if>
+
+    </select>
+
+    <select id="getAllCount" resultType="forumPost">
+        select * from tb_forum_post where target=1
+    </select>
+
+    <select id="getMyCollection" resultMap="userForumPostVo">
+
+    </select>
+
+    <select id="getMyCollections" resultMap="userForumPostVo">
+        select tbb.id,tbb.theme_name,tbb.post_name,tbb.post_picture,tbb.release_time,tbb.user_name,tbb.post_views from
+        (SELECT tb2.id as id,theme_name,post_name,post_picture,release_time,user_name,post_views
+        FROM
+        (SELECT t1.id as id,theme_id,post_name,post_picture,release_time,user_name,post_views
+        FROM tb_forum_post t1
+        INNER JOIN tb_user t2 ON t1.publisher=t2.id AND t1.target=1
+        ) AS tb2
+        INNER JOIN tb_forum_theme tb1 ON tb1.id=tb2.theme_id) tbb where tbb.id in (select post_id from tb_collection where user_id=#{userId})
+
+        <where>
+            <if test="keyWord!=null and keyWord!=''">
+
+                tbb.id like concat('%',#{keyWord},'%')
+                or tbb.theme_name like concat('%',#{keyWord},'%')
+                or tbb.post_name like concat('%',#{keyWord},'%')
+                or tbb.release_time like concat('%',#{keyWord},'%')
+                or tbb.user_name like concat('%',#{keyWord},'%')
+                or tbb.post_context like concat('%',#{keyWord},'%')
+
+            </if>
+
+        </where>
+        <if test="sortField != null and sortField != ''">
+            ORDER BY tbb.#{sortField} tbb.#{sortOrder}
+        </if>
+
+    </select>
+
+    <select id="getEChartsData" resultType="com.qst.pojo.ECharts">
+        SELECT count(*)as value,theme_name as name from tb_forum_post t1 INNER JOIN tb_forum_theme t2 on t1.theme_id=t2.id and t1.target=1 GROUP BY theme_id
+    </select>
+
+    <update id="deleteForumPostByThemeId">
+        UPDATE tb_forum_post
+        SET target=0,delete_time=#{currentTime}
+        WHERE theme_id = #{id}
+    </update>
+</mapper>
